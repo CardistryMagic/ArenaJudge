@@ -26,6 +26,9 @@ public class Main implements ActionListener
 	private int numberOfFramesInQueue;
 	private GraphicDisplay graphicDisplay;
 	private final BufferedImage loadingFrame;
+	// create structure
+    private final JFrame frame;
+    private final JPanel panel;
 	
 	/* constructors */
 	
@@ -36,6 +39,8 @@ public class Main implements ActionListener
 	{
 		numberOfFramesInQueue = 1;
 		graphicDisplay = new GraphicDisplay();
+		frame = new JFrame();
+	    panel = new JPanel();
 	} // end of class Main()
 	
 	/**
@@ -55,6 +60,8 @@ public class Main implements ActionListener
 		} // end of if(numberOfFramesInQueue >= 1)
 		
 		graphicDisplay = new GraphicDisplay();
+		frame = new JFrame();
+	    panel = new JPanel();
 	} // end of constructor Main(int numberOfFramesInQueue)
 	
 	/**
@@ -74,6 +81,8 @@ public class Main implements ActionListener
 		} // end of (graphicDisplay != null)
 		
 		numberOfFramesInQueue = 1;
+		frame = new JFrame();
+	    panel = new JPanel();
 	} // end of Main(GraphicDisplay graphicDisplay)
 	
 	/**
@@ -101,6 +110,9 @@ public class Main implements ActionListener
 		{
 			this.numberOfFramesInQueue = 1;
 		} // end of if(numberOfFramesInQueue >= 1)
+		
+		frame = new JFrame();
+	    panel = new JPanel();
 	} // end of Main(int numberOfFramesInQueue, GraphicDisplay graphicDisplay)
 	
 	/* accessors */
@@ -128,29 +140,90 @@ public class Main implements ActionListener
 	/* mutators */
 	private void createGUI()
 	{
-		BufferedImage img;
-		
-		try {
+		try 
+		{
         	// read image
-        	img = ImageIO.read(
+			loadingFrame = ImageIO.read(
         			new File("C:/Users/thedi/Dropbox/VisionTracking2/src/Images/WIN_20180301_08_22_05_Pro.jpg"));
         	
-        	// add image to queue
-//        	queue.add(img);
-        	
-//        	System.out.println(img == null);
-        	
-        } catch (IOException e) {
         }
+		catch (IOException e)
+		{
+			loadingFrame = null;
+        } // end of try
+		
+		Queue<BufferedImage> frameBuffer = new LinkedList<BufferedImage>();
+		
+		for(int i = 0; i < numberOfFramesInQueue; i++)
+		{
+			frameBuffer.add(loadingFrame);
+		} // end of for(int i = 0; i < numberOfFramesInQueue; i++)
+		
+		// initialize GUI
+		panel.setLayout(new BorderLayout());
+      	graphicDisplay = new GraphicsDisplay(img.getWidth(), img.getHeight(), queue);
+        panel.add(graphicDisplay, BorderLayout.CENTER);
+        
+        // initialize mouse adapter
+        MouseAdapter mouseAdapter = new MouseAdapter()
+        {
+        	public void mouseClicked(MouseEvent e)
+        	{
+            	if (graphicDisplay.isCurrentlyCalibrating())
+            	{
+            		int currentMouseX = e.getX();
+            		int currentMouseY = e.getY();
+            		
+            		if(!graphicDisplay.isCoordOneSet())
+            		{
+            			
+            			int[] mouseCoordinates = {currentMouseX, currentMouseY};
+            			graphicDisplay.setCoordOne(currentMouseY);
+            		} // end of if(!graphicDisplay.isCoordOneSet())
+            		else if (!graphicDisplay.isCoordTwoSet()) 
+            		{
+            			int[] arr = {x,y};
+            			graphicDisplay.setCoordTwo(arr);
+            			graphicDisplay.stopCalibration();
+            		} // end of if(!graphicDisplay.isCoordTwoSet())
+            	} // end of if (graphicDisplay.isCurrentlyCalibrating())
+            } // end of method mouseClicked(MouseEvent e)
+        };
+        
+        // add mouse listener to graphics panel
+        panel.addMouseListener(mouseAdapter);
+
+        // initialize calibrate button characteristics
+        JButton calibrationButton = new JButton("Calibration");
+        calibrationButton.setActionCommand("calibrate");
+        calibrationButton.addActionListener(this);
+        panel.add(calibrationButton, BorderLayout.SOUTH);
+        
+        // add all components to graphics frame
+        frame.add(panel);
+        frame.pack();
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);  
 	}
 	
 	
 	/* utility */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
+		int[] placeholderMouseCoordinates = {-1, -1};
+		graphicDisplay.setCoordOne(placeholderMouseCoordinates);
+		graphicDisplay.setCoordTwo(placeholderMouseCoordinates);
+		graphicDisplay.calibrate();
 	} // end of method actionPerformed(ActionEvent e)
 	
-	
+	public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                Main ArenaJudgerGUI = new Main();
+                ArenaJudgerGUI.createGUI();
+            }
+        });
+    }
 } // end of class Main
