@@ -218,7 +218,6 @@ public class Main implements ActionListener
 	
 	public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
-
             @Override
             public void run() {
                 Main ArenaJudgerGUI = new Main();
