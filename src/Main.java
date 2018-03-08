@@ -25,8 +25,8 @@ public class Main implements ActionListener
 	/* instance fields */
 	private int numberOfFramesInQueue;
 	private GraphicDisplay graphicDisplay;
-	private final BufferedImage loadingFrame;
-	// create structure
+	private BufferedImage loadingFrame;
+	private String loadingFrameFileLocation = "C:/Users/thedi/Dropbox/VisionTracking2/src/Images/WIN_20180301_08_22_05_Pro.jpg";
     private final JFrame frame;
     private final JPanel panel;
 	
@@ -38,9 +38,19 @@ public class Main implements ActionListener
 	public Main()
 	{
 		numberOfFramesInQueue = 1;
-		graphicDisplay = new GraphicDisplay();
+		graphicDisplay = null;
 		frame = new JFrame();
 	    panel = new JPanel();
+	    try 
+		{
+        	// read image
+			loadingFrame = ImageIO.read(new File(loadingFrameFileLocation));
+        	
+        }
+		catch (IOException e)
+		{
+			loadingFrame = null;
+        } // end of try
 	} // end of class Main()
 	
 	/**
@@ -58,10 +68,19 @@ public class Main implements ActionListener
 		{
 			this.numberOfFramesInQueue = 1;
 		} // end of if(numberOfFramesInQueue >= 1)
-		
-		graphicDisplay = new GraphicDisplay();
 		frame = new JFrame();
 	    panel = new JPanel();
+	    
+	    try 
+		{
+        	// read image
+			loadingFrame = ImageIO.read(new File(loadingFrameFileLocation));
+        	
+        }
+		catch (IOException e)
+		{
+			loadingFrame = null;
+        } // end of try
 	} // end of constructor Main(int numberOfFramesInQueue)
 	
 	/**
@@ -74,15 +93,22 @@ public class Main implements ActionListener
 		if (graphicDisplay != null)
 		{
 			this.graphicDisplay = graphicDisplay;
-		}
-		else
-		{
-			this.graphicDisplay = new GraphicDisplay();
 		} // end of (graphicDisplay != null)
 		
 		numberOfFramesInQueue = 1;
 		frame = new JFrame();
 	    panel = new JPanel();
+	    
+	    try 
+		{
+        	// read image
+			loadingFrame = ImageIO.read(new File(loadingFrameFileLocation));
+        	
+        }
+		catch (IOException e)
+		{
+			loadingFrame = null;
+        } // end of try
 	} // end of Main(GraphicDisplay graphicDisplay)
 	
 	/**
@@ -96,10 +122,6 @@ public class Main implements ActionListener
 		if (graphicDisplay != null)
 		{
 			this.graphicDisplay = graphicDisplay;
-		}
-		else
-		{
-			this.graphicDisplay = new GraphicDisplay();
 		} // end of (graphicDisplay != null)
 		
 		if(numberOfFramesInQueue >= 1)
@@ -113,6 +135,18 @@ public class Main implements ActionListener
 		
 		frame = new JFrame();
 	    panel = new JPanel();
+	    
+	    try 
+		{
+        	// read image
+			loadingFrame = ImageIO.read(
+        			new File(loadingFrameFileLocation));
+        	
+        }
+		catch (IOException e)
+		{
+			loadingFrame = null;
+        } // end of try
 	} // end of Main(int numberOfFramesInQueue, GraphicDisplay graphicDisplay)
 	
 	/* accessors */
@@ -140,17 +174,7 @@ public class Main implements ActionListener
 	/* mutators */
 	private void createGUI()
 	{
-		try 
-		{
-        	// read image
-			loadingFrame = ImageIO.read(
-        			new File("C:/Users/thedi/Dropbox/VisionTracking2/src/Images/WIN_20180301_08_22_05_Pro.jpg"));
-        	
-        }
-		catch (IOException e)
-		{
-			loadingFrame = null;
-        } // end of try
+		
 		
 		Queue<BufferedImage> frameBuffer = new LinkedList<BufferedImage>();
 		
@@ -161,7 +185,7 @@ public class Main implements ActionListener
 		
 		// initialize GUI
 		panel.setLayout(new BorderLayout());
-      	graphicDisplay = new GraphicsDisplay(img.getWidth(), img.getHeight(), queue);
+      	graphicDisplay = new GraphicDisplay(loadingFrame.getWidth(), loadingFrame.getHeight(), frameBuffer);
         panel.add(graphicDisplay, BorderLayout.CENTER);
         
         // initialize mouse adapter
