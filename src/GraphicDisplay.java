@@ -31,9 +31,8 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private int calibrationY2;
 	private int currentFrameBufferID = 0;
 	private BufferedImage currentVideoCaptureFrame;
-	private Mat currentWebcamFrame;
 	private Queue<BufferedImage> frameBuffer;
-	private VisionProcessor visionProcessor = new VisionProcessor();
+//	private VisionProcessor visionProcessor = new VisionProcessor();
 	private boolean isCalibrated = false;
 	private boolean isCurrentlyCalibrating = false;
 	private BufferedImage recordingOverlay;
@@ -43,7 +42,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private double[] rgbThresholdBlue = {0.0, 110};
 	private static final long serialVersionUID = 1L;
 	private boolean showCalibrationFrame = false;
-	private VideoCapture webcamCapture;
+	private WebcamCapture webcamCapture;
 	
 	/* constructors */
 	
@@ -63,10 +62,8 @@ public class GraphicDisplay extends JComponent implements ActionListener
         
         // initialize current frame
     	currentVideoCaptureFrame = this.frameBuffer.remove();
-    	currentWebcamFrame = new Mat();
     	
-    	// initialize video camera capture
-        webcamCapture = new VideoCapture(0);
+    	webcamCapture = new WebcamCapture(0);
         
         try {
         	// read recording frame image
@@ -91,33 +88,20 @@ public class GraphicDisplay extends JComponent implements ActionListener
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		BufferedImage temporaryWebcamFrame = null;
-		String formatted = String.format("%03d", currentFrameNumber);
+		String formatted = String.format("%03d", currentFrameBufferID);
 		
 		// update GUI
 		repaint();
 		
-		if(webcamCapture.isOpened())
+		if (webcamCapture.getCurrentFrameMat() != null)
 		{
-			// read image from webcam
-			webcamCapture.read(currentWebcamFrame);
+			// process current frame
+//			videoProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
+//					getBlueRGBThreshold(), getGreenRGBThreshold());
 			
-			if (!currentWebcamFrame.empty())
-			{
-				// convert current frame from mat to buffered image
-				temporaryWebcamFrame = matToBufferedImage(currentWebcamFrame);
-				
-				// process current frame
-				videoProcessor.process(webcamImage, this.getRedRGBThreshold(), , this.getBlueRGBThreshold(), this.getGreenRGBThreshold());
-				
-				// add current frame to frame buffer
-				frameBuffer.add(temporaryWebcamFrame);
-			} // end of if (!currentWebcamFrame.empty())
+			// add current frame to frame buffer
+			frameBuffer.add(webcamCapture.getCurrentFrameBufferedImage());
 		}
-		else
-		{
-			System.out.println(" --(!) No captured frame -- Break!");   
-		} // end of if(webcamCapture.isOpened())
 		
 		// update current frame number
 		currentFrameBufferID = (currentFrameBufferID + 1) % numberOfFramesInQueue;
@@ -129,37 +113,149 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	
 	/* accessors */
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCurrentlyCalibrating()
+	{
+		return this.isCurrentlyCalibrating;
+	} // end of method isCurrentlyCalibrating()
+	
+	/**
+	 * Returns the first set of calibration coordinates.
+	 * 
+	 * @return first set of calibration coordinates
+	 */
+	public int[] getCoordOne()
+	{
+		int[] arr = {calibrationX1, calibrationY1};
+		return arr;
+	} // end of method getCoordOne()
+	
+	/**
+	 * Returns the second set of calibration coordinates.
+	 * 
+	 * @return second set of calibration coordinates
+	 */
+	public int[] getCoordTwo()
+	{
+		int[] arr = {calibrationX2, calibrationY2};
+		return arr;
+	} // end of method getCoordTwo()
+	
+	/**
+	 * Returns if the first set of calibration coordinates have been initialized.
+	 * 
+	 * @return if the first set of calibration coordinates have been initialized
+	 */
+	public boolean isCoordOneSet()
+	{
+		return calibrationX1 != -1 && calibrationY1 != -1;
+	} // end of method isCoordOneSet()
+	
+	/**
+	 * Returns if the second set of calibration coordinates have been initialized.
+	 * 
+	 * @return if the second set of calibration coordinates have been initialized
+	 */
+	public boolean isCoordTwoSet()
+	{
+		return calibrationX2 != -1 && calibrationY2 != -1;
+	} // end of method isCoordTwoSet()
+	
+	/**
+	 * Returns the red RGB calibration threshold values.
+	 * 
+	 * @return red RGB calibration threshold values
+	 */
+	public double[] getRedRGBThreshold()
+	{
+		return rgbThresholdRed;
+	} // end of method getRedRGBThreshold()
+	
+	/**
+	 * Returns the green RGB calibration threshold values.
+	 * 
+	 * @return green RGB calibration threshold values
+	 */
+	public double[] getGreenRGBThreshold()
+	{
+		return rgbThresholdGreen;
+	} // end of method getGreenRGBThreshold()
+	
+	/**
+	 * Returns the blue RGB calibration threshold values.
+	 * 
+	 * @return blue RGB calibration threshold values
+	 */
+	public double[] getBlueRGBThreshold()
+	{
+		return rgbThresholdBlue;
+	} // end of method getBlueRGBThreshold()
 	
 	/* mutators */
 
-	private BufferedImage matToBufferedImage(Mat matrix) {  
-		int cols = matrix.cols();  
-		int rows = matrix.rows();  
-		int elemSize = (int)matrix.elemSize();  
-		byte[] data = new byte[cols * rows * elemSize];  
-		int type;  
-		matrix.get(0, 0, data);  
-		switch (matrix.channels()) {  
-		case 1:  
-			type = BufferedImage.TYPE_BYTE_GRAY;  
-			break;  
-		case 3:  
-			type = BufferedImage.TYPE_3BYTE_BGR;  
-			// bgr to rgb  
-			byte b;  
-			for(int i=0; i<data.length; i=i+3) {  
-				b = data[i];  
-				data[i] = data[i+2];  
-				data[i+2] = b;  
-			}  
-			break;  
-		default:  
-			return null;  
-		}  
-		BufferedImage image2 = new BufferedImage(cols, rows, type);  
-		image2.getRaster().setDataElements(0, 0, cols, rows, data);  
-		return image2;  
+	/**
+	 * Set first set of calibration coordinates.
+	 * 
+	 * @param arr first set of calibration coordinates
+	 */
+	public void setCoordOne(int[] arr)
+	{
+		calibrationX1 = arr[0];
+		calibrationY1 = arr[1];
+	} // end of method setCoordOne(int[] arr)
+	
+	/**
+	 * Set second set of calibration coordinates.
+	 * 
+	 * @param arr second set of calibration coordinates
+	 */
+	public void setCoordTwo(int[] arr)
+	{
+		calibrationX2 = arr[0];
+		calibrationY2 = arr[1];
+	} // end of method setCoordTwo(int[] arr)
+	
+	/**
+	 * Starts the calibration process.
+	 */
+	public void startCalibration()
+	{
+		isCurrentlyCalibrating = true;
+	} // end of method startCalibration()
+	
+	/**
+	 * Ends the calibration process.
+	 */
+	public void stopCalibration()
+	{
+		isCurrentlyCalibrating = false;
+		
+		Robot robot;
+		try
+		{
+			robot = new Robot();
+			BufferedImage screenShot = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+			screenShot = cropImage(screenShot, this.getCoordOne(), this.getCoordTwo());
+			Color avg = averageColor(screenShot);
+			
+			double[] r = {avg.getRed() - 50, 255};
+			double[] g = {0, avg.getGreen() + 50};
+			double[] b = {0, avg.getBlue() + 50};
+			
+			rgbThresholdRed = r;
+			rgbThresholdBlue = b;
+			rgbThresholdGreen = g;
+		}
+		catch (AWTException e)
+		{
+			e.printStackTrace();
+		} // end of try
 	}
+	
+	
 	
 	private void startAnimation() 
 	{
@@ -173,7 +269,54 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	    } // end of if (animationTimer == null) 
 	} // end of method startAnimation()
 	
+	private void setCurrentFrame(BufferedImage currentVideoCaptureFrame)
+	{
+		this.currentVideoCaptureFrame = currentVideoCaptureFrame;
+	}
+	
 	/* utility */
+	
+	private Color averageColor(BufferedImage bi) {
+	    int x1 = bi.getWidth();
+	    int y1 = bi.getHeight();
+	    int x0 = 0;
+	    int y0 = 0;
+	    int num = 0;
+	    long sumr = 0, sumg = 0, sumb = 0;
+	    for (int x = x0; x < x1; x++) {
+	        for (int y = y0; y < y1; y++) {
+	            Color pixel = new Color(bi.getRGB(x, y));
+	            sumr += pixel.getRed();
+	            sumg += pixel.getGreen();
+	            sumb += pixel.getBlue();
+	            num += 1;
+	        }
+	    }
+	    System.out.println(sumr / num + " " + sumg / num + " " + sumb / num);
+	    return new Color((int)sumr / num, (int) sumg / num, (int) sumb / num);
+	}
+	
+	private BufferedImage cropImage(BufferedImage src, int[] coord1, int[] coord2)
+	{
+		int x1 = coord1[0];
+		int y1 = coord1[1];
+		
+		System.out.println(x1 + " " + y1);
+		
+		int width = Math.abs(calibrationX2 - x1);
+		int height = Math.abs(calibrationY2 - y1);
+	    BufferedImage dest = src.getSubimage(x1+8, y1+32, width, height);
+	    File outputfile = new File("C:/Users/thedi/Dropbox/VisionTracking2/src/Images/saved.png");
+	    try 
+	    {
+	    	ImageIO.write(dest, "png", outputfile);
+		}
+	    catch (IOException e) 
+	    {
+			e.printStackTrace();
+		}
+	    return dest;
+	}
 	
 	@Override
     public void paintComponent(Graphics g) 
@@ -181,16 +324,18 @@ public class GraphicDisplay extends JComponent implements ActionListener
         super.paintComponent(g);
         
         // draw current frame
-        g.drawImage(currentFrame, 10, 10, currentFrame.getWidth()+10, currentFrame.getHeight()+10, 0, 0, 
-        		currentFrame.getWidth(), currentFrame.getHeight(), null);
+        g.drawImage(currentVideoCaptureFrame, 10, 10, currentVideoCaptureFrame.getWidth()+10, 
+        		currentVideoCaptureFrame.getHeight()+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
+        		currentVideoCaptureFrame.getHeight(), null);
         // draw recording frame
-        g.drawImage(recordingFrame, 10, 10, currentFrame.getWidth()+10, currentFrame.getHeight()+10, 0, 0, 
-        		currentFrame.getWidth(), currentFrame.getHeight(), null);
-        // draw 
-//        this.showCalibrationFrame = !this.showCalibrationFrame;
+        g.drawImage(recordingOverlay, 10, 10, currentVideoCaptureFrame.getWidth()+10, 
+        		currentVideoCaptureFrame.getHeight()+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
+        		currentVideoCaptureFrame.getHeight(), null);
+        // draw calibrating frame
         if (this.isCurrentlyCalibrating()) {
-        	g.drawImage(calibratingFrame, 10, 10, currentFrame.getWidth()+10, currentFrame.getHeight()+10, 0, 0, 
-            		currentFrame.getWidth(), currentFrame.getHeight(), null);
+        	g.drawImage(calibrationOverlay, 10, 10, currentVideoCaptureFrame.getWidth()+10, 
+        			currentVideoCaptureFrame.getHeight()+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
+        			currentVideoCaptureFrame.getHeight(), null);
         }
     }
 	

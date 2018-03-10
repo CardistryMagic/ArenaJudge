@@ -154,7 +154,7 @@ public class Main implements ActionListener
 	/**
 	 * Returns the number of frames in the frame buffer at any given moment in time.
 	 * 
-	 * @return numberOfFramesInQueue number of frames in the frame buffer at any given moment in time
+	 * @return number of frames in the frame buffer at any given moment in time
 	 */
 	public int getNumberOfBufferFrames()
 	{
@@ -164,7 +164,7 @@ public class Main implements ActionListener
 	/**
 	 * Returns the graphic display.
 	 * 
-	 * @return graphicDisplay graphic display
+	 * @return graphic display
 	 */
 	public GraphicDisplay getGraphicDisplay()
 	{
@@ -174,8 +174,6 @@ public class Main implements ActionListener
 	/* mutators */
 	private void createGUI()
 	{
-		
-		
 		Queue<BufferedImage> frameBuffer = new LinkedList<BufferedImage>();
 		
 		for(int i = 0; i < numberOfFramesInQueue; i++)
@@ -197,17 +195,17 @@ public class Main implements ActionListener
             	{
             		int currentMouseX = e.getX();
             		int currentMouseY = e.getY();
+            		int[] mouseCoordinates = {currentMouseX, currentMouseY};
             		
             		if(!graphicDisplay.isCoordOneSet())
             		{
             			
-            			int[] mouseCoordinates = {currentMouseX, currentMouseY};
-            			graphicDisplay.setCoordOne(currentMouseY);
+            			
+            			graphicDisplay.setCoordOne(mouseCoordinates);
             		} // end of if(!graphicDisplay.isCoordOneSet())
             		else if (!graphicDisplay.isCoordTwoSet()) 
             		{
-            			int[] arr = {x,y};
-            			graphicDisplay.setCoordTwo(arr);
+            			graphicDisplay.setCoordTwo(mouseCoordinates);
             			graphicDisplay.stopCalibration();
             		} // end of if(!graphicDisplay.isCoordTwoSet())
             	} // end of if (graphicDisplay.isCurrentlyCalibrating())
@@ -237,7 +235,7 @@ public class Main implements ActionListener
 		int[] placeholderMouseCoordinates = {-1, -1};
 		graphicDisplay.setCoordOne(placeholderMouseCoordinates);
 		graphicDisplay.setCoordTwo(placeholderMouseCoordinates);
-		graphicDisplay.calibrate();
+		graphicDisplay.startCalibration();
 	} // end of method actionPerformed(ActionEvent e)
 	
 	public static void main(String[] args) {
