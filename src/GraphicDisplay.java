@@ -65,18 +65,24 @@ public class GraphicDisplay extends JComponent implements ActionListener
     	
     	webcamCapture = new WebcamCapture(0);
         
-        try {
+        try 
+        {
         	// read recording frame image
-        	recordingOverlay = ImageIO.read(new File("C:/Users/thedi/Dropbox/VisionTracking2/src/Images/RecordingFrame.png"));
-        	
-        } catch (IOException e) {
+        	recordingOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/RecordingOverlay.png"));
+//        	System.out.println(recordingOverlay == null);
+        } 
+        catch (IOException e) 
+        {
         }
-        
-        try {
+        System.out.println(recordingOverlay == null);
+        try 
+        {
         	// read recording frame image
-        	calibrationOverlay = ImageIO.read(new File("C:/Users/thedi/Dropbox/VisionTracking2/src/Images/CalibratingFrame.png"));
+        	calibrationOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/CalibratingOverlay.png"));
         	
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
         }
 
         // set preferred size for frame
