@@ -58,7 +58,7 @@ public class WebcamCapture {
 	 */
 	public Mat getCurrentFrameMat()
 	{
-		Mat currentWebcamMat = null;
+		Mat currentWebcamMat = new Mat();
 		if(videoCapture.isOpened())
 		{
 			// read image from webcam

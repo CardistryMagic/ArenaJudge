@@ -253,7 +253,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
 		{
 			e.printStackTrace();
 		} // end of try
-	}
+	} // end of method stopCalibration()
 	
 	
 	
@@ -272,11 +272,12 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private void setCurrentFrame(BufferedImage currentVideoCaptureFrame)
 	{
 		this.currentVideoCaptureFrame = currentVideoCaptureFrame;
-	}
+	} // end of method setCurrentFrame(BufferedImage currentVideoCaptureFrame)
 	
 	/* utility */
 	
-	private Color averageColor(BufferedImage bi) {
+	private Color averageColor(BufferedImage bi) 
+	{
 	    int x1 = bi.getWidth();
 	    int y1 = bi.getHeight();
 	    int x0 = 0;
@@ -294,7 +295,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	    }
 	    System.out.println(sumr / num + " " + sumg / num + " " + sumb / num);
 	    return new Color((int)sumr / num, (int) sumg / num, (int) sumb / num);
-	}
+	} // end of method averageColor(BufferedImage bi)
 	
 	private BufferedImage cropImage(BufferedImage src, int[] coord1, int[] coord2)
 	{
@@ -316,10 +317,10 @@ public class GraphicDisplay extends JComponent implements ActionListener
 			e.printStackTrace();
 		}
 	    return dest;
-	}
+	} // end of method cropImage(BufferedImage src, int[] coord1, int[] coord2)
 	
 	@Override
-    public void paintComponent(Graphics g) 
+    public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
         
@@ -337,9 +338,6 @@ public class GraphicDisplay extends JComponent implements ActionListener
         			currentVideoCaptureFrame.getHeight()+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
         			currentVideoCaptureFrame.getHeight(), null);
         }
-    }
-	
-	
-	
+    } // end of method paintComponent(Graphics g)
 	
 }

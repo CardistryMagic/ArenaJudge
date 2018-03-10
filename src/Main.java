@@ -26,7 +26,7 @@ public class Main implements ActionListener
 	private int numberOfFramesInQueue;
 	private GraphicDisplay graphicDisplay;
 	private BufferedImage loadingFrame;
-	private String loadingFrameFileLocation = "C:/Users/thedi/Dropbox/VisionTracking2/src/Images/WIN_20180301_08_22_05_Pro.jpg";
+	private String loadingFrameFileLocation = "C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/LoadingFrame.jpg";
     private final JFrame frame;
     private final JPanel panel;
 	
@@ -179,6 +179,7 @@ public class Main implements ActionListener
 		for(int i = 0; i < numberOfFramesInQueue; i++)
 		{
 			frameBuffer.add(loadingFrame);
+			System.out.println(loadingFrame == null);
 		} // end of for(int i = 0; i < numberOfFramesInQueue; i++)
 		
 		// initialize GUI
