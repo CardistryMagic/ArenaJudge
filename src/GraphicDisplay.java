@@ -32,7 +32,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private int currentFrameBufferID = 0;
 	private BufferedImage currentVideoCaptureFrame;
 	private Queue<BufferedImage> frameBuffer;
-//	private VisionProcessor visionProcessor = new VisionProcessor();
+	private VisionProcessor visionProcessor = new VisionProcessor();
 	private boolean isCalibrated = false;
 	private boolean isCurrentlyCalibrating = false;
 	private BufferedImage recordingOverlay;
@@ -96,8 +96,8 @@ public class GraphicDisplay extends JComponent implements ActionListener
 		if (webcamCapture.getCurrentFrameMat() != null)
 		{
 			// process current frame
-//			videoProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
-//					getBlueRGBThreshold(), getGreenRGBThreshold());
+			visionProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
+					getBlueRGBThreshold(), getGreenRGBThreshold());
 			
 			// add current frame to frame buffer
 			frameBuffer.add(webcamCapture.getCurrentFrameBufferedImage());
