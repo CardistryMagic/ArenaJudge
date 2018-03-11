@@ -22,7 +22,7 @@ import org.opencv.core.CvType;
 public class GraphicDisplay extends JComponent implements ActionListener 
 {
 	/* instance fields */
-	private int animationDelay = 30;
+	private int animationDelay = (int) 1000/60;
 	private Timer animationTimer;
 	private BufferedImage calibrationOverlay;
 	private int calibrationX1;
@@ -42,6 +42,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private double[] rgbThresholdBlue = {0.0, 110};
 	private static final long serialVersionUID = 1L;
 	private boolean showCalibrationFrame = false;
+	private boolean startMatch;
 	private WebcamCapture webcamCapture;
 	
 	/* constructors */
@@ -69,7 +70,6 @@ public class GraphicDisplay extends JComponent implements ActionListener
         {
         	// read recording frame image
         	recordingOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/RecordingOverlay.png"));
-//        	System.out.println(recordingOverlay == null);
         } 
         catch (IOException e) 
         {
@@ -102,8 +102,13 @@ public class GraphicDisplay extends JComponent implements ActionListener
 		if (webcamCapture.getCurrentFrameMat() != null)
 		{
 			// process current frame
-			visionProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
-					getBlueRGBThreshold(), getGreenRGBThreshold());
+			if (visionProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
+					getBlueRGBThreshold(), getGreenRGBThreshold(), startMatch))
+			{
+				System.out.println("OUT!");
+			}
+			
+			if (startMatch) startMatch = false;
 			
 			// add current frame to frame buffer
 			frameBuffer.add(webcamCapture.getCurrentFrameBufferedImage());
@@ -202,6 +207,14 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	
 	/* mutators */
 
+	/**
+	 * Starts the match countdown.
+	 */
+	public void startMatch()
+	{
+		startMatch = true;
+	}
+	
 	/**
 	 * Set first set of calibration coordinates.
 	 * 

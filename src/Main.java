@@ -217,10 +217,16 @@ public class Main implements ActionListener
         panel.addMouseListener(mouseAdapter);
 
         // initialize calibrate button characteristics
-        JButton calibrationButton = new JButton("Calibration");
-        calibrationButton.setActionCommand("calibrate");
+        JButton calibrationButton = new JButton("Calibrate");
+        calibrationButton.setActionCommand("Calibrate");
         calibrationButton.addActionListener(this);
-        panel.add(calibrationButton, BorderLayout.SOUTH);
+        panel.add(calibrationButton, BorderLayout.LINE_START);
+        
+        // initialize start match button characteristics
+        JButton startMatchButton = new JButton("Start match");
+        startMatchButton.setActionCommand("StartMatch");
+        startMatchButton.addActionListener(this);
+        panel.add(startMatchButton, BorderLayout.LINE_END);
         
         // add all components to graphics frame
         frame.add(panel);
@@ -233,10 +239,19 @@ public class Main implements ActionListener
 	/* utility */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		int[] placeholderMouseCoordinates = {-1, -1};
-		graphicDisplay.setCoordOne(placeholderMouseCoordinates);
-		graphicDisplay.setCoordTwo(placeholderMouseCoordinates);
-		graphicDisplay.startCalibration();
+		String actionName = e.getActionCommand();
+		if (actionName.equals("Calibrate"))
+		{
+			int[] placeholderMouseCoordinates = {-1, -1};
+			graphicDisplay.setCoordOne(placeholderMouseCoordinates);
+			graphicDisplay.setCoordTwo(placeholderMouseCoordinates);
+			graphicDisplay.startCalibration();
+		}
+		else if (actionName.equals("StartMatch"))
+		{
+			System.out.println("START");
+			graphicDisplay.startMatch();
+		}
 	} // end of method actionPerformed(ActionEvent e)
 	
 	public static void main(String[] args) {

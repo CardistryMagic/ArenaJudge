@@ -7,6 +7,8 @@ public class WebcamCapture {
 	private int webcamID;
 	private VideoCapture videoCapture;
 	
+	private BufferedImage sampleWebcamInput;
+	
 	/* constructors */
 	
 	/**

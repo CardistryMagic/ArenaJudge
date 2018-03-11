@@ -19,6 +19,12 @@ public class VisionProcessor
 		private ArrayList<MatOfPoint> findContoursOutput;
 		private ArrayList<MatOfPoint> filterContoursOutput;
 		private int lastSize = 0;
+		private int outOfBoundBuffer;
+		private final int outOfBoundBufferMaxSize = 2;
+		private int startMatchInBoundsCounter = 0;
+		private final int minimumInBoundsStartMatch = 5;
+		private boolean matchStarted = false;
+		private boolean startButtonPressed = false;
 
 		public VisionProcessor() {
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -26,12 +32,15 @@ public class VisionProcessor
 			cvErodeOutput = new Mat();
 			findContoursOutput = new ArrayList<MatOfPoint>();
 			filterContoursOutput = new ArrayList<MatOfPoint>();
+			outOfBoundBuffer = 0;
 		}
 
 		/**
 		 * This is the primary method that runs the entire pipeline and updates the outputs.
 		 */
-		public int process(Mat source0, double[] rgbThresholdRed, double[] rgbThresholdGreen, double[] rgbThresholdBlue) {
+		public boolean process(Mat source0, double[] rgbThresholdRed, double[] rgbThresholdGreen, 
+				double[] rgbThresholdBlue, boolean startMatch)
+		{
 			// Step RGB_Threshold0:
 			Mat rgbThresholdInput = source0;
 			
@@ -70,19 +79,69 @@ public class VisionProcessor
 					filterContoursSolidity, filterContoursMaxVertices, filterContoursMinVertices, 
 					filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
 		
-			if (filterContoursOutput.size() == 2 && lastSize != filterContoursOutput.size()) {
-			System.out.println(filterContoursOutput.size());
-			System.out.println("READY -- IN BOUNDS");
-			lastSize = filterContoursOutput.size();
-		}
-		else if (lastSize != filterContoursOutput.size()){
-			System.out.println(filterContoursOutput.size());
-			System.out.println("OUT OF BOUNDS");
-			lastSize = filterContoursOutput.size();
-		}
+//			if (filterContoursOutput.size() == 2 && lastSize != filterContoursOutput.size()) {
+//			System.out.println(filterContoursOutput.size());
+//			System.out.println("READY -- IN BOUNDS");
+//			lastSize = filterContoursOutput.size();
+//		}
+//		else if (lastSize != filterContoursOutput.size()){
+//			System.out.println(filterContoursOutput.size());
+//			System.out.println("OUT OF BOUNDS");
+//			lastSize = filterContoursOutput.size();
+//		}
+//			
+//			System.out.println(filterContoursOutput.size());
+			if (matchStarted)
+			{
+				if (filterContoursOutput.size() == 2)
+				{
+					outOfBoundBuffer = 0;
+				}
+				else
+				{
+					outOfBoundBuffer++;
+				} // end of if (filterContoursOutput.size() == 2)
+				
+				boolean out = outOfBoundBuffer >= outOfBoundBufferMaxSize;
+				if (out)
+				{
+					outOfBoundBuffer = 0;
+					matchStarted = false;
+					startButtonPressed = false;
+				}
+				return out;
+			}
+			else if (!matchStarted && startMatch)
+			{
+				startMatchInBoundsCounter = 0;
+				startButtonPressed = true;
+				return false;
+			}
+			else if (startButtonPressed)
+			{
+				System.out.println(filterContoursOutput.size());
+				if (filterContoursOutput.size() == 2)
+				{
+					startMatchInBoundsCounter++;
+					if (startMatchInBoundsCounter >= minimumInBoundsStartMatch)
+					{
+						matchStarted = true;
+					}
+				}
+				else
+				{
+					startMatchInBoundsCounter = 0;
+				}
+				
+//				System.out.println(startMatchInBoundsCounter);
+				return false;
+			}
+			else
+			{
+				return false;
+			}
 			
-			System.out.println(filterContoursOutput.size());
-			return filterContoursOutput.size();
+//			return filterContoursOutput.size();
 			
 		}
 
