@@ -20,7 +20,7 @@ public class VisionProcessor
 		private ArrayList<MatOfPoint> filterContoursOutput;
 		private int lastSize = 0;
 		private int outOfBoundBuffer;
-		private final int outOfBoundBufferMaxSize = 2;
+		private final int outOfBoundBufferMaxSize = 4;
 		private int startMatchInBoundsCounter = 0;
 		private final int minimumInBoundsStartMatch = 5;
 		private boolean matchStarted = false;
@@ -118,7 +118,7 @@ public class VisionProcessor
 			}
 			else if (startButtonPressed)
 			{
-//				System.out.println(filterContoursOutput.size());
+				System.out.println(filterContoursOutput.size());
 				if (filterContoursOutput.size() == 2)
 				{
 					startMatchInBoundsCounter++;

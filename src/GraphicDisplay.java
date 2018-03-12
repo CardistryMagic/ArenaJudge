@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.awt.image.DataBufferByte;
 import org.opencv.core.Mat;
@@ -32,6 +35,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private int currentFrameBufferID = 0;
 	private BufferedImage currentVideoCaptureFrame;
 	private Queue<BufferedImage> frameBuffer;
+	private Queue<BufferedImage> instantReplayBuffer;
 	private VisionProcessor visionProcessor = new VisionProcessor();
 	private boolean isCalibrated = false;
 	private boolean isCurrentlyCalibrating = false;
@@ -51,6 +55,10 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private BufferedImage matchInProgressOverlay = null;
 	private BufferedImage robotsOutOverlay = null;
 	private int matchStatus = 0;
+	private boolean showInstantReplay = false;
+	private int numberOfFramesInInstantReplayQueue = 10;
+	private ArrayList<BufferedImage> instantReplayFrameBuffer;
+	private int instantReplayFrameIndex = 0;
 	
 	/* constructors */
 	
@@ -67,16 +75,22 @@ public class GraphicDisplay extends JComponent implements ActionListener
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         this.frameBuffer = frameBuffer;
+        instantReplayBuffer = new LinkedList<BufferedImage>();
         
         // initialize current frame
     	currentVideoCaptureFrame = this.frameBuffer.remove();
     	
-    	webcamCapture = new WebcamCapture(1);
+    	webcamCapture = new WebcamCapture(0);
         
         try 
         {
         	// read recording frame image
         	recordingOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/RecordingOverlay.png"));
+        	System.out.println(recordingOverlay == null);
+        	for (int i = 0; i < numberOfFramesInInstantReplayQueue; i++)
+            {
+            	instantReplayBuffer.add(recordingOverlay);
+            }
         } 
         catch (IOException e) 
         {
@@ -145,6 +159,8 @@ public class GraphicDisplay extends JComponent implements ActionListener
         catch (IOException e) 
         {
         }
+        
+        
 
         // set preferred size for frame
         setPreferredSize(new Dimension(frameWidth + 20, frameHeight + 20));
@@ -170,16 +186,25 @@ public class GraphicDisplay extends JComponent implements ActionListener
 //			}
 			matchStatus = visionProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
 					getBlueRGBThreshold(), getGreenRGBThreshold(), startMatch);
-			System.out.println(matchStatus);
+			
+			if (matchStatus == 3)
+			{
+				showInstantReplay = true;
+				instantReplayFrameBuffer = new ArrayList<>(instantReplayBuffer);
+			}
+//			System.out.println(matchStatus);
 			
 			if (startMatch) startMatch = false;
 			
 			// add current frame to frame buffer
 			frameBuffer.add(webcamCapture.getCurrentFrameBufferedImage());
+			instantReplayBuffer.remove();
+			instantReplayBuffer.add(webcamCapture.getCurrentFrameBufferedImage());
 		}
 		
 		// update current frame number
 		currentFrameBufferID = (currentFrameBufferID + 1) % numberOfFramesInQueue;
+		instantReplayFrameIndex = (instantReplayFrameIndex + 1) % numberOfFramesInInstantReplayQueue;
 		
 		BufferedImage currentDisplayFrame = frameBuffer.remove();
 		
@@ -269,8 +294,18 @@ public class GraphicDisplay extends JComponent implements ActionListener
 		return rgbThresholdBlue;
 	} // end of method getBlueRGBThreshold()
 	
+	public boolean isShowingInstantReplay()
+	{
+		return showInstantReplay;
+	}
+	
 	/* mutators */
 
+	public void stopInstantReplay()
+	{
+		showInstantReplay = false;
+	}
+	
 	/**
 	 * Starts the match countdown.
 	 */
@@ -414,6 +449,14 @@ public class GraphicDisplay extends JComponent implements ActionListener
         		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
         		currentVideoCaptureFrame.getHeight(), null);
         
+        // draw instant replay
+        if (showInstantReplay)
+        {
+        	g.drawImage(instantReplayFrameBuffer.get(instantReplayFrameIndex), 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+            		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
+            		currentVideoCaptureFrame.getHeight(), null);
+        }
+        
         // draw recording frame
         g.drawImage(recordingOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
         		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
@@ -458,7 +501,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
             		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
             		currentVideoCaptureFrame.getHeight()*4, null);
         }
-        else if (matchStatus == 3)
+        if (showInstantReplay)
         {
         	g.drawImage(robotsOutOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
             		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 

@@ -242,10 +242,17 @@ public class Main implements ActionListener
 		String actionName = e.getActionCommand();
 		if (actionName.equals("Calibrate"))
 		{
-			int[] placeholderMouseCoordinates = {-1, -1};
-			graphicDisplay.setCoordOne(placeholderMouseCoordinates);
-			graphicDisplay.setCoordTwo(placeholderMouseCoordinates);
-			graphicDisplay.startCalibration();
+			if (graphicDisplay.isShowingInstantReplay())
+			{
+				graphicDisplay.stopInstantReplay();
+			}
+			else
+			{
+				int[] placeholderMouseCoordinates = {-1, -1};
+				graphicDisplay.setCoordOne(placeholderMouseCoordinates);
+				graphicDisplay.setCoordTwo(placeholderMouseCoordinates);
+				graphicDisplay.startCalibration();
+			}
 		}
 		else if (actionName.equals("StartMatch"))
 		{
