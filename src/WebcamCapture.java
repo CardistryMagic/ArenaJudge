@@ -1,5 +1,6 @@
 import java.awt.image.BufferedImage;
 import org.opencv.core.Mat;
+import org.opencv.highgui.Highgui;
 import org.opencv.videoio.VideoCapture;
 
 public class WebcamCapture {
@@ -29,6 +30,8 @@ public class WebcamCapture {
 	{
 		this.webcamID = webcamID;
 		videoCapture = new VideoCapture(this.webcamID);
+		videoCapture.set(3, 1280);
+		videoCapture.set(4, 960);
 	} // end of VideoCapture(int webcamID)
 	
 	/* accessors */

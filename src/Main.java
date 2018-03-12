@@ -184,7 +184,7 @@ public class Main implements ActionListener
 		
 		// initialize GUI
 		panel.setLayout(new BorderLayout());
-      	graphicDisplay = new GraphicDisplay(loadingFrame.getWidth(), loadingFrame.getHeight(), frameBuffer);
+      	graphicDisplay = new GraphicDisplay(1300, 980, frameBuffer);
         panel.add(graphicDisplay, BorderLayout.CENTER);
         
         // initialize mouse adapter

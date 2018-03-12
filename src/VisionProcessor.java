@@ -37,6 +37,13 @@ public class VisionProcessor
 
 		/**
 		 * This is the primary method that runs the entire pipeline and updates the outputs.
+		 * 
+		 * Return values:
+		 *  - 0: match not started
+		 *  - 1: match started, standby for robots to turn on
+		 *  - 2: match started, all robots currently in
+		 *  - 3: match ended, timed out
+		 *  - 4: match ended, robot went out of bounds
 		 */
 		public boolean process(Mat source0, double[] rgbThresholdRed, double[] rgbThresholdGreen, 
 				double[] rgbThresholdBlue, boolean startMatch)

@@ -344,18 +344,19 @@ public class GraphicDisplay extends JComponent implements ActionListener
         super.paintComponent(g);
         
         // draw current frame
-        g.drawImage(currentVideoCaptureFrame, 10, 10, currentVideoCaptureFrame.getWidth()+10, 
-        		currentVideoCaptureFrame.getHeight()+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
+        g.drawImage(currentVideoCaptureFrame, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+        		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
         		currentVideoCaptureFrame.getHeight(), null);
+        
         // draw recording frame
-        g.drawImage(recordingOverlay, 10, 10, currentVideoCaptureFrame.getWidth()+10, 
-        		currentVideoCaptureFrame.getHeight()+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
-        		currentVideoCaptureFrame.getHeight(), null);
+        g.drawImage(recordingOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+        		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
+        		currentVideoCaptureFrame.getHeight()*4, null);
         // draw calibrating frame
         if (this.isCurrentlyCalibrating()) {
-        	g.drawImage(calibrationOverlay, 10, 10, currentVideoCaptureFrame.getWidth()+10, 
-        			currentVideoCaptureFrame.getHeight()+10, 0, 0, currentVideoCaptureFrame.getWidth(), 
-        			currentVideoCaptureFrame.getHeight(), null);
+        	g.drawImage(calibrationOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+            		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
+            		currentVideoCaptureFrame.getHeight()*4, null);
         }
     } // end of method paintComponent(Graphics g)
 	
