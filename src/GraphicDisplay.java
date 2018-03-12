@@ -44,6 +44,13 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private boolean showCalibrationFrame = false;
 	private boolean startMatch;
 	private WebcamCapture webcamCapture;
+	private BufferedImage notCalibratedOverlay = null;
+	private BufferedImage calibratedOverlay = null;
+	private BufferedImage matchNotStartedOverlay = null;
+	private BufferedImage matchStartedStandbyOverlay = null;
+	private BufferedImage matchInProgressOverlay = null;
+	private BufferedImage robotsOutOverlay = null;
+	private int matchStatus = 0;
 	
 	/* constructors */
 	
@@ -64,7 +71,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
         // initialize current frame
     	currentVideoCaptureFrame = this.frameBuffer.remove();
     	
-    	webcamCapture = new WebcamCapture(0);
+    	webcamCapture = new WebcamCapture(1);
         
         try 
         {
@@ -74,12 +81,66 @@ public class GraphicDisplay extends JComponent implements ActionListener
         catch (IOException e) 
         {
         }
-        System.out.println(recordingOverlay == null);
+        
         try 
         {
         	// read recording frame image
         	calibrationOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/CalibratingOverlay.png"));
         	
+        } 
+        catch (IOException e) 
+        {
+        }
+        
+        try 
+        {
+        	// read recording frame image
+        	notCalibratedOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/NotCalibratedOverlay.png"));
+        } 
+        catch (IOException e) 
+        {
+        }
+        
+        try 
+        {
+        	// read recording frame image
+        	calibratedOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/CalibratedOverlay.png"));
+        } 
+        catch (IOException e) 
+        {
+        }
+        
+        try 
+        {
+        	// read recording frame image
+        	matchNotStartedOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/MatchNotStartedOverlay.png"));
+        } 
+        catch (IOException e) 
+        {
+        }
+        
+        try 
+        {
+        	// read recording frame image
+        	matchStartedStandbyOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/MatchStartingOverlay.png"));
+        } 
+        catch (IOException e) 
+        {
+        }
+        
+        try 
+        {
+        	// read recording frame image
+        	matchInProgressOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/MatchInProgressOverlay.png"));
+        } 
+        catch (IOException e) 
+        {
+        }
+        
+        try 
+        {
+        	// read recording frame image
+        	robotsOutOverlay = ImageIO.read(new File("C:/Users/thedi/Desktop/ArenaJudge/ArenaJudge/src/Images/InstantReplayOverlay.png"));
         } 
         catch (IOException e) 
         {
@@ -102,11 +163,14 @@ public class GraphicDisplay extends JComponent implements ActionListener
 		if (webcamCapture.getCurrentFrameMat() != null)
 		{
 			// process current frame
-			if (visionProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
-					getBlueRGBThreshold(), getGreenRGBThreshold(), startMatch))
-			{
-				System.out.println("OUT!");
-			}
+//			if (visionProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
+//					getBlueRGBThreshold(), getGreenRGBThreshold(), startMatch))
+//			{
+//				System.out.println("OUT!");
+//			}
+			matchStatus = visionProcessor.process(webcamCapture.getCurrentFrameMat(), getRedRGBThreshold(), 
+					getBlueRGBThreshold(), getGreenRGBThreshold(), startMatch);
+			System.out.println(matchStatus);
 			
 			if (startMatch) startMatch = false;
 			
@@ -272,6 +336,8 @@ public class GraphicDisplay extends JComponent implements ActionListener
 		{
 			e.printStackTrace();
 		} // end of try
+		
+		isCalibrated = true;
 	} // end of method stopCalibration()
 	
 	
@@ -355,6 +421,46 @@ public class GraphicDisplay extends JComponent implements ActionListener
         // draw calibrating frame
         if (this.isCurrentlyCalibrating()) {
         	g.drawImage(calibrationOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+            		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
+            		currentVideoCaptureFrame.getHeight()*4, null);
+        }
+        
+        // draw calibration overlay
+        if (!isCalibrated)
+        {
+        	g.drawImage(notCalibratedOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+            		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
+            		currentVideoCaptureFrame.getHeight()*4, null);
+        }
+        else
+        {
+        	g.drawImage(calibratedOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+            		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
+            		currentVideoCaptureFrame.getHeight()*4, null);
+        }
+        
+        // draw match status overlay
+        if (matchStatus == 0)
+        {
+        	g.drawImage(matchNotStartedOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+            		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
+            		currentVideoCaptureFrame.getHeight()*4, null);
+        }
+        else if (matchStatus == 1)
+        {
+        	g.drawImage(matchStartedStandbyOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+            		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
+            		currentVideoCaptureFrame.getHeight()*4, null);
+        }
+        else if (matchStatus == 2)
+        {
+        	g.drawImage(matchInProgressOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
+            		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
+            		currentVideoCaptureFrame.getHeight()*4, null);
+        }
+        else if (matchStatus == 3)
+        {
+        	g.drawImage(robotsOutOverlay, 10, 10, currentVideoCaptureFrame.getWidth()*2+10, 
             		currentVideoCaptureFrame.getHeight()*2+10, 0, 0, currentVideoCaptureFrame.getWidth()*4, 
             		currentVideoCaptureFrame.getHeight()*4, null);
         }

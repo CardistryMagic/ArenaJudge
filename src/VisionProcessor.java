@@ -42,10 +42,9 @@ public class VisionProcessor
 		 *  - 0: match not started
 		 *  - 1: match started, standby for robots to turn on
 		 *  - 2: match started, all robots currently in
-		 *  - 3: match ended, timed out
-		 *  - 4: match ended, robot went out of bounds
+		 *  - 3: match ended, robot went out of bounds
 		 */
-		public boolean process(Mat source0, double[] rgbThresholdRed, double[] rgbThresholdGreen, 
+		public int process(Mat source0, double[] rgbThresholdRed, double[] rgbThresholdGreen, 
 				double[] rgbThresholdBlue, boolean startMatch)
 		{
 			// Step RGB_Threshold0:
@@ -86,18 +85,7 @@ public class VisionProcessor
 					filterContoursSolidity, filterContoursMaxVertices, filterContoursMinVertices, 
 					filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
 		
-//			if (filterContoursOutput.size() == 2 && lastSize != filterContoursOutput.size()) {
-//			System.out.println(filterContoursOutput.size());
-//			System.out.println("READY -- IN BOUNDS");
-//			lastSize = filterContoursOutput.size();
-//		}
-//		else if (lastSize != filterContoursOutput.size()){
-//			System.out.println(filterContoursOutput.size());
-//			System.out.println("OUT OF BOUNDS");
-//			lastSize = filterContoursOutput.size();
-//		}
-//			
-//			System.out.println(filterContoursOutput.size());
+			// process current match status
 			if (matchStarted)
 			{
 				if (filterContoursOutput.size() == 2)
@@ -115,18 +103,22 @@ public class VisionProcessor
 					outOfBoundBuffer = 0;
 					matchStarted = false;
 					startButtonPressed = false;
+					return 3;
 				}
-				return out;
+				else
+				{
+					return 2;
+				}
 			}
 			else if (!matchStarted && startMatch)
 			{
 				startMatchInBoundsCounter = 0;
 				startButtonPressed = true;
-				return false;
+				return 1;
 			}
 			else if (startButtonPressed)
 			{
-				System.out.println(filterContoursOutput.size());
+//				System.out.println(filterContoursOutput.size());
 				if (filterContoursOutput.size() == 2)
 				{
 					startMatchInBoundsCounter++;
@@ -141,11 +133,11 @@ public class VisionProcessor
 				}
 				
 //				System.out.println(startMatchInBoundsCounter);
-				return false;
+				return 1;
 			}
 			else
 			{
-				return false;
+				return 0;
 			}
 			
 //			return filterContoursOutput.size();
