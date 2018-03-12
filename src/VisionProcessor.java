@@ -69,7 +69,7 @@ public class VisionProcessor
 
 			// Step Filter_Contours0:
 			ArrayList<MatOfPoint> filterContoursContours = findContoursOutput;
-			double filterContoursMinArea = 20000.0;
+			double filterContoursMinArea = 8000.0;
 			double filterContoursMinPerimeter = 0;
 			double filterContoursMinWidth = 0;
 			double filterContoursMaxWidth = 1000;

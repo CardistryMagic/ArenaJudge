@@ -56,7 +56,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
 	private BufferedImage robotsOutOverlay = null;
 	private int matchStatus = 0;
 	private boolean showInstantReplay = false;
-	private int numberOfFramesInInstantReplayQueue = 10;
+	private int numberOfFramesInInstantReplayQueue = 30;
 	private ArrayList<BufferedImage> instantReplayFrameBuffer;
 	private int instantReplayFrameIndex = 0;
 	
@@ -80,7 +80,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
         // initialize current frame
     	currentVideoCaptureFrame = this.frameBuffer.remove();
     	
-    	webcamCapture = new WebcamCapture(0);
+    	webcamCapture = new WebcamCapture(1);
         
         try 
         {
@@ -360,8 +360,8 @@ public class GraphicDisplay extends JComponent implements ActionListener
 			Color avg = averageColor(screenShot);
 			
 			double[] r = {avg.getRed() - 50, 255};
-			double[] g = {0, avg.getGreen() + 50};
-			double[] b = {0, avg.getBlue() + 50};
+			double[] g = {0, avg.getGreen() + 60};
+			double[] b = {0, avg.getBlue() + 60};
 			
 			rgbThresholdRed = r;
 			rgbThresholdBlue = b;
