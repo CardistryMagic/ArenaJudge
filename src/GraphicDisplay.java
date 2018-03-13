@@ -80,7 +80,7 @@ public class GraphicDisplay extends JComponent implements ActionListener
         // initialize current frame
     	currentVideoCaptureFrame = this.frameBuffer.remove();
     	
-    	webcamCapture = new WebcamCapture(1);
+    	webcamCapture = new WebcamCapture(0);
         
         try 
         {
